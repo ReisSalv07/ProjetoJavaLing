@@ -43,8 +43,8 @@ O sistema conta com uma carga inicial de dados (`BancoDados.java`) para que voc√
 
 1. **Clone o reposit√≥rio ou baixe os arquivos:**
 ```bash
-git clone https://github.com/seu-usuario/sistema-escolar-inteligente.git
-cd sistema-escolar-inteligente/src
+[[git clone https://github.com/seu-usuario/sistema-escolar-inteligente.git
+cd sistema-escolar-inteligente/src](https://github.com/ReisSalv07/ProjetoJavaLing.git)](https://github.com/ReisSalv07/ProjetoJavaLing.git)
 
 ```
 
