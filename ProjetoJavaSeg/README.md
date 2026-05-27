@@ -26,8 +26,11 @@ O sistema adapta suas funcionalidades dinamicamente dependendo do perfil do usu�
 O sistema conta com uma carga inicial de dados (`BancoDados.java`) para que você possa testar os diferentes fluxos imediatamente sem precisar cadastrar tudo do zero:
 
 | Perfil | Usuário | Senha | O que testar? |
+
 | **Administrador** | `admin` | `admin123` | Cadastrar novos alunos/professores e turmas. |
+
 | **Professor** | `prof1` | `123` | Lançar nota/falta na Turma `MAT-101` para o aluno `MAT202601`. |
+
 | **Aluno** | `aluno1` | `123` | Visualizar o boletim e histórico de notas. |
 
 ---
