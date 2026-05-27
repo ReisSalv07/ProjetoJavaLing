@@ -13,10 +13,27 @@ public class Aluno extends Usuario {
         this.matricula = matricula;
     }
 
-    public String getMatricula() { return matricula; }
-    public Map<String, Double> getNotas() { return notas; }
-    public Map<String, Integer> getFaltas() { return faltas; }
+    public String getMatricula() {
+        return matricula;
+    }
 
-    public void lancarNota(String disciplina, double nota) { this.notas.put(disciplina, nota); }
-    public void lancarFalta(String disciplina, int qtdFaltas) { this.faltas.put(disciplina, qtdFaltas); }
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
+    }
+
+    public Map<String, Double> getNotas() {
+        return notas;
+    }
+
+    public void setNotas(Map<String, Double> notas) {
+        this.notas = notas;
+    }
+
+    public Map<String, Integer> getFaltas() {
+        return faltas;
+    }
+
+    public void setFaltas(Map<String, Integer> faltas) {
+        this.faltas = faltas;
+    }
 }
