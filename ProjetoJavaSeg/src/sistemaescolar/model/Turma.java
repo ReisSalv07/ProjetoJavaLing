@@ -15,11 +15,35 @@ public class Turma {
         this.professor = professor;
     }
 
-    // Getters e Setters
-    public String getCodigo() { return codigo; }
-    public String getNomeDisciplina() { return nomeDisciplina; }
-    public Professor getProfessor() { return professor; }
-    public List<Aluno> getAlunosMatriculados() { return alunosMatriculados; }
+    public String getCodigo() {
+        return codigo;
+    }
 
-    public void adicionarAluno(Aluno aluno) { this.alunosMatriculados.add(aluno); }
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public String getNomeDisciplina() {
+        return nomeDisciplina;
+    }
+
+    public void setNomeDisciplina(String nomeDisciplina) {
+        this.nomeDisciplina = nomeDisciplina;
+    }
+
+    public Professor getProfessor() {
+        return professor;
+    }
+
+    public void setProfessor(Professor professor) {
+        this.professor = professor;
+    }
+
+    public List<Aluno> getAlunosMatriculados() {
+        return alunosMatriculados;
+    }
+
+    public void setAlunosMatriculados(List<Aluno> alunosMatriculados) {
+        this.alunosMatriculados = alunosMatriculados;
+    }
 }

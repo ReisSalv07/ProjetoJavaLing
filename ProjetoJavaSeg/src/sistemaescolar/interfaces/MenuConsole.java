@@ -1,17 +1,17 @@
 package sistemaescolar.interfaces;
 
-import sistemaescolar.model.*;
-import sistemaescolar.service.*;
+import sistemaescolar.controller.EscolaController;
+import sistemaescolar.model.Perfil;
+import sistemaescolar.model.Usuario;
 import java.util.Scanner;
 
 public class MenuConsole {
-    private AutenticacaoService authService = new AutenticacaoService();
-    private SecretariaService secretaria = new SecretariaService();
+    private EscolaController controller = new EscolaController();
     private Scanner scanner = new Scanner(System.in);
 
     public void iniciar() {
         while (true) {
-            if (AutenticacaoService.usuarioLogado == null) {
+            if (controller.obterUsuarioLogado() == null) {
                 exibirMenuLogin();
             } else {
                 exibirMenuPrincipal();
@@ -26,20 +26,21 @@ public class MenuConsole {
         System.out.print("Senha: ");
         String senha = scanner.nextLine();
 
-        if (authService.login(login, senha)) {
-            System.out.println("Login efetuado com sucesso! Bem-vindo, " + AutenticacaoService.usuarioLogado.getNome());
+        if (controller.efetuarLogin(login, senha)) {
+            System.out.println("Acesso liberado! Bem-vindo, " + controller.obterUsuarioLogado().getNome());
         } else {
-            System.out.println("Usuário ou senha inválidos.");
+            System.out.println("Falha na autenticação. Verifique os dados digitados.");
         }
     }
 
     private void exibirMenuPrincipal() {
-        Usuario logado = AutenticacaoService.usuarioLogado;
+        Usuario logado = controller.obterUsuarioLogado();
         System.out.println("\n--- MENU PRINCIPAL (" + logado.getPerfil() + ") ---");
 
+        // Renderização dinâmica baseada no Perfil de Acesso obtido do controlador
         if (logado.getPerfil() == Perfil.ADMIN) {
-            System.out.println("1. Cadastrar Aluno/Professor");
-            System.out.println("2. Cadastrar Turma");
+            System.out.println("1. Cadastrar Aluno ou Professor");
+            System.out.println("2. Cadastrar Nova Turma");
             System.out.println("3. Emitir Relatório Geral de Turma");
         } else if (logado.getPerfil() == Perfil.PROFESSOR) {
             System.out.println("1. Lançar Notas e Faltas");
@@ -48,65 +49,84 @@ public class MenuConsole {
             System.out.println("1. Ver Meu Boletim / Histórico");
         }
 
-        System.out.println("0. Logout");
+        System.out.println("0. Sair (Logout)");
         System.out.print("Escolha uma opção: ");
-        int opcao = Integer.parseInt(scanner.nextLine());
 
-        processarComando(opcao);
+        try {
+            int opcao = Integer.parseInt(scanner.nextLine());
+            processarComando(opcao);
+        } catch (NumberFormatException e) {
+            System.out.println("Erro: Digite apenas números correspondentes às opções do menu.");
+        }
     }
 
     private void processarComando(int opcao) {
         if (opcao == 0) {
-            authService.logout();
-            System.out.println("Sessão encerrada.");
+            controller.efetuarLogout();
             return;
         }
 
-        Perfil perfil = AutenticacaoService.usuarioLogado.getPerfil();
+        Perfil perfil = controller.obterUsuarioLogado().getPerfil();
 
-        // Fluxo do Administrador
+        // --- FLUXO DO ADMINISTRADOR --- //
         if (perfil == Perfil.ADMIN) {
-            if (opcao == 1) {
-                System.out.print("Nome: "); String nome = scanner.nextLine();
-                System.out.print("Login: "); String log = scanner.nextLine();
-                System.out.print("Senha: "); String senha = scanner.nextLine();
-                System.out.print("Tipo (1-Aluno, 2-Professor): "); int tipo = Integer.parseInt(scanner.nextLine());
+            switch (opcao) {
+                case 1:
+                    System.out.print("Nome do Usuário: "); String nome = scanner.nextLine();
+                    System.out.print("Login de Acesso: "); String log = scanner.nextLine();
+                    System.out.print("Senha de Acesso: "); String senha = scanner.nextLine();
+                    System.out.print("Tipo de Conta (1 - Aluno, 2 - Professor): ");
+                    int tipo = Integer.parseInt(scanner.nextLine());
 
-                if (tipo == 1) {
-                    System.out.print("Matrícula: "); String mat = scanner.nextLine();
-                    secretaria.cadastrarUsuario(new Aluno(log, senha, nome, mat));
-                } else {
-                    System.out.print("Especialidade: "); String esp = scanner.nextLine();
-                    secretaria.cadastrarUsuario(new Professor(log, senha, nome, esp));
-                }
-            } else if (opcao == 2) {
-                System.out.print("Código da Turma: "); String cod = scanner.nextLine();
-                System.out.print("Nome da Disciplina: "); String disc = scanner.nextLine();
-                secretaria.cadastrarTurma(new Turma(cod, disc, null));
-            } else if (opcao == 3) {
-                System.out.print("Código da Turma: "); String cod = scanner.nextLine();
-                secretaria.relatorioTurma(cod);
+                    if (tipo == 1) {
+                        System.out.print("Código de Matrícula: "); String mat = scanner.nextLine();
+                        controller.cadastrarAluno(log, senha, nome, mat);
+                    } else {
+                        System.out.print("Especialidade do Professor: "); String esp = scanner.nextLine();
+                        controller.cadastrarProfessor(log, senha, nome, esp);
+                    }
+                    break;
+                case 2:
+                    System.out.print("Código Identificador da Turma: "); String cod = scanner.nextLine();
+                    System.out.print("Nome da Disciplina: "); String disc = scanner.nextLine();
+                    controller.cadastrarTurma(cod, disc);
+                    break;
+                case 3:
+                    System.out.print("Digite o código da turma para o relatório: "); String codRelatorio = scanner.nextLine();
+                    controller.gerarRelatorioDaTurma(codRelatorio);
+                    break;
+                default:
+                    System.out.println("Opção inválida para o perfil Administrador.");
             }
         }
 
-        // Fluxo do Professor
+        // --- FLUXO DO PROFESSOR --- //
         else if (perfil == Perfil.PROFESSOR) {
-            if (opcao == 1) {
-                System.out.print("Código da Turma: "); String cod = scanner.nextLine();
-                System.out.print("Matrícula do Aluno: "); String mat = scanner.nextLine();
-                System.out.print("Nota: "); double nota = Double.parseDouble(scanner.nextLine());
-                System.out.print("Faltas: "); int faltas = Integer.parseInt(scanner.nextLine());
-                secretaria.lancarNotaEFalta(cod, mat, nota, faltas);
-            } else if (opcao == 2) {
-                System.out.print("Código da Turma: "); String cod = scanner.nextLine();
-                secretaria.relatorioTurma(cod);
+            switch (opcao) {
+                case 1:
+                    System.out.print("Código da Turma: "); String codTurma = scanner.nextLine();
+                    System.out.print("Matrícula do Aluno: "); String matAluno = scanner.nextLine();
+                    System.out.print("Nota Final (0.0 a 10.0): "); double nota = Double.parseDouble(scanner.nextLine());
+                    System.out.print("Quantidade de Faltas: "); int faltas = Integer.parseInt(scanner.nextLine());
+                    controller.lancarDesempenho(codTurma, matAluno, nota, faltas);
+                    break;
+                case 2:
+                    System.out.print("Digite o código da sua turma: "); String codMinhaTurma = scanner.nextLine();
+                    controller.gerarRelatorioDaTurma(codMinhaTurma);
+                    break;
+                default:
+                    System.out.println("Opção inválida para o perfil Professor.");
             }
         }
 
-        // Fluxo do Aluno
+        // --- FLUXO DO ALUNO --- //
         else if (perfil == Perfil.ALUNO) {
-            if (opcao == 1) {
-                secretaria.emitirBoletim((Aluno) AutenticacaoService.usuarioLogado);
+            switch (opcao) {
+                case 1:
+                    controller.gerarBoletimDoAluno();
+                    break;
+                default:
+                    System.out.println("Opção inválida para o perfil Aluno.");
             }
         }
     }
